@@ -19,6 +19,9 @@ private_path = os.getenv('private_path')
 data_base_url = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}'
 AVATAR_DIR = "photo/avatar"
 WATERMARK_DIR = "photo/watermark/photo_2024-10-31_16-57-13.jpg"
+daily_rating_limit = 5
+email_password = os.getenv('email_password')
+base_email = os.getenv('email')
 def load_private_key():
     with open(f"{private_path}", "rb") as key_file:
         private_key = serialization.load_pem_private_key(

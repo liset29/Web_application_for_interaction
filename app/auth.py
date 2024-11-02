@@ -3,8 +3,7 @@ import jwt
 import config as con
 from datetime import timedelta, datetime
 from sqlalchemy.ext.asyncio import AsyncSession
-# from app.server.schemas import UserSchema
-from fastapi import Depends, Form, HTTPException, status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt.exceptions import InvalidTokenError
 
