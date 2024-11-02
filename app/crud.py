@@ -1,7 +1,7 @@
 import base64
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, asc, desc
 from starlette import status
 
 from app.auth import encode_jwt
@@ -85,3 +85,23 @@ async def add_rating(rater_id, rated_user, session):
     rating = Rating(rater_id=rater_id, rated_id=rated_user.id)
     session.add(rating)
     await session.commit()
+
+
+async def get_all_users(gender,first_name,last_name,sort_by_registration,session):
+    query = select(UserModel)
+
+    if gender:
+        query = query.filter(UserModel.gender == gender)
+    if first_name:
+        query = query.filter(UserModel.first_name.ilike(f"%{first_name}%"))
+    if last_name:
+        query = query.filter(UserModel.last_name.ilike(f"%{last_name}%"))
+
+    if sort_by_registration == "Последние зарегистрированные":
+        query = query.order_by(asc(UserModel.created_at))
+    elif sort_by_registration == "Ранее зарегистрированные":
+        query = query.order_by(desc(UserModel.created_at))
+
+    result = await session.execute(query)
+    users = result.scalars().all()
+    return users

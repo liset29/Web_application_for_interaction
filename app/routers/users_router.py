@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Annotated
+from typing import Annotated, Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, status, Body, Query, UploadFile, File, HTTPException
@@ -8,10 +8,10 @@ from fastapi.security import HTTPBearer
 
 from app import crud
 from app.auth import encode_jwt, get_curresnt_active_auth_user
-from app.crud import rate_the_user
+from app.crud import rate_the_user, get_all_users
 from app.db_helper import db_helper
 from app.models import Rating
-from app.schemes import TokenInfo, UserModel, UserModelCreated
+from app.schemes import TokenInfo, UserModel, UserModelCreated, UserResponse, GenderEnum, SortByRegistrationEnum
 from app.utils_rating import check_daily_limit
 from app.utils_users import validate_auth_user
 from app.watermark import add_watermark_and_save
@@ -22,7 +22,7 @@ http_bearer = HTTPBearer()
 users_router = APIRouter(prefix="/user", tags=['USER'])
 
 
-@users_router.post("/login/", response_model=TokenInfo,
+@users_router.post("/api/login", response_model=TokenInfo,
                   description='Endpoint that issues jwt token',
                   response_description="Token",
                   status_code=status.HTTP_200_OK,
@@ -36,7 +36,7 @@ async def auth_user(user: UserModel = Depends(validate_auth_user)):
     return TokenInfo(access_token=token, token_type='Bearer')
 
 
-@users_router.get('/users/me', description='Endpoint that shows the data of users who have passed authentication',
+@users_router.get('/api/users/me', description='Endpoint that shows the data of users who have passed authentication',
                  response_description="User",
                  response_model=UserModel,
                  status_code=status.HTTP_200_OK,
@@ -76,6 +76,18 @@ async def rate_user(id: int,
     result = await rate_the_user(id,user,session)
     return result
 
+@users_router.get("/api/list", response_model=List[UserResponse])
+async def get_users_list(
+    gender: Optional[GenderEnum] = Query(None, description="filter by gender"),
+    first_name: Optional[str] = Query(None, description="filter by first_name"),
+    last_name: Optional[str] = Query(None, description="filter by last_name"),
+    sort_by_registration: Optional[SortByRegistrationEnum] = Query(None, description="filter by registration date"),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+):
+
+
+    users = await get_all_users(gender,first_name,last_name,sort_by_registration,session)
+    return users
 
 
 
