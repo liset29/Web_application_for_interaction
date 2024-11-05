@@ -1,6 +1,6 @@
 import asyncio
 from app.db_helper import db_helper
-from models import Base
+from .models import Base
 
 
 async def init_models():
@@ -9,4 +9,3 @@ async def init_models():
         await conn.run_sync(Base.metadata.create_all)
 
 
-asyncio.run(init_models())

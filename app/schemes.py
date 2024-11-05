@@ -1,6 +1,10 @@
 from datetime import datetime
 from enum import Enum
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
+
+from const import LATEST, EARLIEST, MALE, FEMALE
 
 
 class TokenInfo(BaseModel):
@@ -9,13 +13,13 @@ class TokenInfo(BaseModel):
 
 
 class SortByRegistrationEnum(str, Enum):
-    latest = "Последние зарегистрированные"
-    earliest = "Ранее зарегистрированные"
+    latest = LATEST
+    earliest = EARLIEST
 
 
 class GenderEnum(str, Enum):
-    male = "мужской"
-    female = "женский"
+    male = MALE
+    female = FEMALE
 
 
 class UserModel(BaseModel):
@@ -31,6 +35,8 @@ class UserModel(BaseModel):
 
 class UserModelCreated(UserModel):
     password: str
+    latitude: float
+    longitude: float
 
 
 class UserResponse(BaseModel):
@@ -42,6 +48,15 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {datetime: lambda v: v.isoformat()}
+
+class UserFilter(BaseModel):
+    gender: Optional[GenderEnum] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    sort_by_registration: Optional[SortByRegistrationEnum] = None
+    max_distance: Optional[float] = None
+
+class RateResponse(BaseModel):
+    message: str
+    email: Optional[str] = None

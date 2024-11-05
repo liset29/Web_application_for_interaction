@@ -1,0 +1,13 @@
+HOST = 'localhost'
+USER = 'root'
+PASSWORD = 'root'
+DATABASE = 'test_db'
+PORT = 5432
+public_path=certs\\jwt-public.pem
+private_path=certs\\jwt-private.pem
+access_token_expire = 15
+algorithm = "RS256"
+email_password = 'ifax sbbh oouc fozx'
+email = 'example@gmail.com'
+host_email = 'smtp.gmail.com'
+port_email = '587'
